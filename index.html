@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>James & Co. Essentials | Final Project</title>
+    <style>
+        :root { --shopee-orange: #ee4d2d; --bg: #f6f6f6; --dark: #222; }
+        
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--bg); margin: 0; padding: 0; }
+        
+        /* Navigation with Search Bar */
+        nav { background: white; padding: 10px 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; gap: 20px; }
+        .logo-text { font-size: 22px; font-weight: bold; color: var(--shopee-orange); letter-spacing: 1px; flex-shrink: 0; }
+        
+        .search-box { flex-grow: 1; max-width: 600px; }
+        .search-box input { width: 100%; padding: 10px 15px; border: 1px solid #ddd; border-radius: 4px; outline: none; }
+        .search-box input:focus { border-color: var(--shopee-orange); }
+
+        .main-wrapper { max-width: 1200px; margin: 25px auto; display: grid; grid-template-columns: 1fr 380px; gap: 20px; padding: 0 15px; }
+
+        /* Product Grid */
+        .clothes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px; }
+        .clothing-card { background: white; border-radius: 4px; overflow: hidden; border: 1px solid #e0e0e0; transition: 0.3s; position: relative; }
+        .clothing-card:hover { border-color: var(--shopee-orange); transform: translateY(-4px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); }
+        
+        .img-holder { height: 260px; background: #fff; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        .img-holder img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .card-details { padding: 15px; }
+        .product-name { font-size: 14px; margin-bottom: 8px; height: 34px; color: #333; overflow: hidden; font-weight: 500; }
+        .product-price { color: var(--shopee-orange); font-size: 20px; font-weight: bold; }
+        
+        .btn-add { width: 100%; border: 1px solid var(--shopee-orange); background: white; color: var(--shopee-orange); padding: 10px; cursor: pointer; margin-top: 10px; font-weight: bold; border-radius: 2px; }
+        .btn-add:hover { background: #fff5f3; }
+        .btn-add:disabled { border-color: #ccc; color: #ccc; cursor: not-allowed; }
+
+        /* Sidebar Cart */
+        .side-cart { background: white; padding: 20px; border-radius: 4px; height: fit-content; position: sticky; top: 85px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .cart-row { display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px dashed #eee; }
+        .thumb { width: 50px; height: 50px; border-radius: 4px; overflow: hidden; border: 1px solid #eee; flex-shrink: 0; }
+        .thumb img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .qty-area { display: flex; align-items: center; gap: 8px; margin-top: 5px; }
+        .small-btn { border: 1px solid #ddd; background: #fff; width: 24px; height: 24px; cursor: pointer; }
+
+        /* Order Summary */
+        .promo-box { margin-top: 15px; display: flex; gap: 5px; }
+        .promo-box input { flex-grow: 1; padding: 8px; border: 1px solid #ddd; border-radius: 3px; font-size: 12px; }
+        .promo-box button { background: #333; color: white; border: none; padding: 0 10px; cursor: pointer; border-radius: 3px; }
+
+        .checkout-section { margin-top: 20px; padding-top: 15px; border-top: 2px solid #eee; }
+        .summary-row { display: flex; justify-content: space-between; font-size: 14px; color: #666; margin-bottom: 5px; }
+        .total-text { font-size: 26px; color: var(--shopee-orange); font-weight: bold; text-align: right; margin-top: 10px; }
+        
+        .checkout-btn { width: 100%; background: var(--shopee-orange); color: white; border: none; padding: 15px; font-size: 16px; font-weight: bold; margin-top: 15px; cursor: pointer; border-radius: 4px; }
+        .checkout-btn:hover { background: #d73211; }
+
+        footer { text-align: center; padding: 40px 0; color: #888; font-size: 12px; border-top: 1px solid #ddd; margin-top: 50px; background: white; }
+
+        @media (max-width: 900px) { .main-wrapper { grid-template-columns: 1fr; } nav { flex-wrap: wrap; } .search-box { order: 3; max-width: 100%; } }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo-text">JAMES & CO.</div>
+        
+        <div class="search-box">
+            <input type="text" placeholder="Search for street essentials...">
+        </div>
+
+        <div style="color: #888; font-size: 11px; text-align: right; flex-shrink: 0;">
+            BSIT - WEB SYSTEMS 1<br>FINAL PROJECT
+        </div>
+    </nav>
+
+    <div class="main-wrapper">
+        <div class="clothes-grid" id="shopFloor"></div>
+
+        <div class="side-cart">
+            <h3 style="margin-top:0; font-size: 18px;">Shopping Bag (<span id="bagCount">0</span>)</h3>
+            <div id="bagItems"></div>
+            
+            <div id="paymentArea" style="display:none;">
+                <div class="promo-box">
+                    <input type="text" placeholder="Promo Code">
+                    <button onclick="alert('Promo code applied!')">Apply</button>
+                </div>
+
+                <div class="checkout-section">
+                    <div class="summary-row"><span>Subtotal:</span> ₱<span id="subTotalText">0</span></div>
+                    <div class="summary-row"><span>Shipping Fee:</span> ₱50</div>
+                    <div class="total-text">₱<span id="billTotal">0</span></div>
+                </div>
+                
+                <button class="checkout-btn" onclick="checkOutClick()">CHECK OUT NOW</button>
+                <button onclick="clearBag()" style="color:#999; background:none; border:none; cursor:pointer; width:100%; margin-top:15px; text-decoration:underline; font-size: 11px;">Clear Entire Bag</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 James & Co. Essentials | Legazpi City, Albay</p>
+        <p>Computer Arts and Technology College (CATC)</p>
+    </footer>
+
+    <script>
+        // Store Catalog Data
+        const catalogItems = [
+            { id: 1, name: "Premium White Tee", price: 399, img: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=500&q=80" },
+            { id: 2, name: "Essential Gray Hoodie", price: 1250, img: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&w=500&q=80" },
+            { id: 3, name: "Straight Wash Denim", price: 899, img: "https://images.unsplash.com/photo-1542272604-787c3835535d?auto=format&fit=crop&w=500&q=80" },
+            { id: 4, name: "Denim Cut-off Shorts", price: 650, img: "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=500&q=80" },
+            { id: 5, name: "Classic Sneakers", price: 2999, img: "https://images.unsplash.com/photo-1460353581641-37baddab0fa2?auto=format&fit=crop&w=500&q=80" },
+            { id: 6, name: "Red leather Sling Bag", price: 350, img: "https://images.unsplash.com/photo-1575032617751-6ddec2089882?auto=format&fit=crop&w=500&q=80" }
+        ];
+
+        let shoppingBag = [];
+
+        // Build the store display
+        function displayStore() {
+            let floor = document.getElementById('shopFloor');
+            floor.innerHTML = ""; 
+            catalogItems.forEach(p => {
+                let added = shoppingBag.some(c => c.id === p.id);
+                floor.innerHTML += `
+                    <div class="clothing-card">
+                        <div class="img-holder"><img src="${p.img}"></div>
+                        <div class="card-details">
+                            <div class="product-name">${p.name}</div>
+                            <div class="product-price">₱${p.price.toLocaleString()}</div>
+                            <button class="btn-add" onclick="buyItem(${p.id})" ${added ? 'disabled' : ''}>
+                                ${added ? 'Added to Bag' : 'Add to Bag'}
+                            </button>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        // Logic for "Add to Bag" click
+        function buyItem(id) {
+            let choice = catalogItems.find(i => i.id === id);
+            shoppingBag.push({ ...choice, qty: 1 });
+            updateCartUI();
+        }
+
+        // Handle quantity + and -
+        function moveQty(id, num) {
+            let match = shoppingBag.find(c => c.id === id);
+            if (match) {
+                match.qty += num;
+                if (match.qty <= 0) shoppingBag = shoppingBag.filter(c => c.id !== id);
+                updateCartUI();
+            }
+        }
+
+        function clearBag() { shoppingBag = []; updateCartUI(); }
+
+        // Checkout Button Action
+        function checkOutClick() {
+            let total = document.getElementById('billTotal').innerText;
+            alert("Order Success!\n\nJames & Co. Essentials is now processing your order.\nTotal Amount (inc. shipping): ₱" + total);
+            clearBag();
+        }
+
+        // Update the visual sidebar and total bill
+        function updateCartUI() {
+            let list = document.getElementById('bagItems');
+            let subText = document.getElementById('subTotalText');
+            let bill = document.getElementById('billTotal');
+            let area = document.getElementById('paymentArea');
+            let badge = document.getElementById('bagCount');
+            
+            badge.innerText = shoppingBag.length;
+
+            if (shoppingBag.length === 0) {
+                list.innerHTML = "<p style='text-align:center; color:#999; padding:20px; font-size: 13px;'>Your bag is empty.</p>";
+                area.style.display = "none";
+            } else {
+                area.style.display = "block";
+                let totalCost = 0;
+                list.innerHTML = ""; 
+                shoppingBag.forEach(item => {
+                    let sub = item.price * item.qty;
+                    totalCost += sub;
+                    list.innerHTML += `
+                        <div class="cart-row">
+                            <div class="thumb"><img src="${item.img}"></div>
+                            <div style="flex-grow:1;">
+                                <div style="font-size:12px; font-weight:bold;">${item.name}</div>
+                                <div style="color:var(--shopee-orange); font-size:14px; margin-top:3px;">₱${sub.toLocaleString()}</div>
+                                <div class="qty-area">
+                                    <button class="small-btn" onclick="moveQty(${item.id}, -1)">-</button>
+                                    <span style="font-size:13px;">${item.qty}</span>
+                                    <button class="small-btn" onclick="moveQty(${item.id}, 1)">+</button>
+                                </div>
+                            </div>
+                        </div>`;
+                });
+                
+                let shippingFee = 50;
+                subText.innerText = totalCost.toLocaleString();
+                bill.innerText = (totalCost + shippingFee).toLocaleString();
+            }
+            displayStore(); 
+        }
+        displayStore();
+    </script>
+</body>
+</html>
